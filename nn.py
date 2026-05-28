@@ -2,7 +2,16 @@ from engine import Value
 import random
 
 
-class Neuron:
+class Module:
+    def zero_grad(self):
+        for p in self.parameters():
+            p.grad = 0
+
+    def parameters(self):
+        return []
+
+
+class Neuron(Module):
 
     def __init__(self, nin):
         self.w = [(Value(random.uniform(-1, 1))) for _ in range(nin)]
@@ -17,7 +26,7 @@ class Neuron:
         return self.w + [self.b]
 
 
-class Layer:
+class Layer(Module):
 
     # params is (dimension, neuron count per dimension)
     def __init__(self, nin, nout):
@@ -31,7 +40,7 @@ class Layer:
         return [p for neuron in self.neurons for p in neuron.parameters()]
 
 
-class MLP:
+class MLP(Module):
     def __init__(self, nin, nouts):
         sz = [nin] + nouts
         self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(nouts))]
